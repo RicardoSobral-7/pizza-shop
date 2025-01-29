@@ -4,7 +4,7 @@ import { Pizza } from 'lucide-react'
 export function AuthLayout() {
   return (
     // min-h-screen faz com que ocupe a altura toda do monitor
-    <div className="grid min-h-screen grid-cols-2">
+    <div className="grid min-h-screen grid-cols-2 antialiased">
       {/* o /5 é a opacidade */}
       <div className="h-full border-r border-foreground/5 bg-muted p-10 text-muted-foreground flex flex-col justify-between">
         <div className="flex items-center gap-3 text-lg font-medium text-foreground">
@@ -15,7 +15,7 @@ export function AuthLayout() {
           Painel do parceiro &copy; pizza.shop - {new Date().getFullYear()}
         </footer>
       </div>
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center relative">
         <Outlet />
       </div>
     </div>
