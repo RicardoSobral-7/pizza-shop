@@ -5,11 +5,14 @@ import { AuthLayout } from "./pages/_layouts/auth";
 import { SignUp } from "./pages/auth/sign-up";
 import { Orders } from "./pages/app/orders/orders";
 import { Dashboard } from "./pages/app/dashboard/dashboard";
+import { NotFound } from "./pages/404";
 
+// página de not found deve ser colocado no error element
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <AppLayout />,
+    errorElement: <NotFound />,
     children: [
       {
         path: '/',
