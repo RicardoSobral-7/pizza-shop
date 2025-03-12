@@ -5,7 +5,9 @@ import { Helmet } from "react-helmet-async"
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { Link } from "react-router"
+import { Link, useSearchParams } from "react-router"
+import { useMutation } from "@tanstack/react-query"
+import { signIn } from "@/api/sign-in"
 
 const signInForm = z.object({
   email: z.string().email()
@@ -14,11 +16,21 @@ const signInForm = z.object({
 type SignInForm = z.infer<typeof signInForm>
 
 export function SignIn() {
-  const { register, handleSubmit, formState: { isSubmitting } } = useForm<SignInForm>()
+  // é um hook tipo useState que pegamos e setamos search params na url,  podendo pegar todos search params ou apenas um especifico como está ali em baixo
+  const [searchParams] = useSearchParams()
+
+  const { register, handleSubmit, formState: { isSubmitting } } = useForm<SignInForm>({
+    defaultValues: {
+      email: searchParams.get('email') ?? ''
+    }
+  })
+
+  // o mutation Fn é a função que será disparada mara fazer a mutação, mutação é toda ação que não seja listagem/retorno, todo post, put e delete é mutação, todo get é uma 'query' a gora que dessestruturamos o mutateAsync, vamos usa-la para desperar o signIn, agora todos os parametros da função signIn pegamos pelo authenticate que é a renomeação do mutateAsync
+  const { mutateAsync: authenicate } = useMutation({ mutationFn: signIn })
 
   async function handleSignIn(data: SignInForm) {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      await authenicate({ email: data.email })
 
       toast.success('Enviamos um link de autenticação para seu e-mail.', {
         action: {
