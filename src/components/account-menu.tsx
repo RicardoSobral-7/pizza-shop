@@ -1,25 +1,38 @@
 
-import { Building, ChevronDown, LogOut } from "lucide-react";
-import { Button } from "./ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { useQuery } from "@tanstack/react-query";
-import { getProfile } from "@/api/get-profile";
 import { getManagedRestaurant } from "@/api/get-managed-restaurant";
-import { Skeleton } from "./ui/skeleton";
-import { Dialog, DialogTrigger } from "./ui/dialog";
+import { getProfile } from "@/api/get-profile";
+import { signOut } from "@/api/sign-out";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Building, ChevronDown, LogOut } from "lucide-react";
+import { useNavigate } from "react-router";
 import { StoreProfileDialog } from "./store-profile-dialog";
+import { Button } from "./ui/button";
+import { Dialog, DialogTrigger } from "./ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Skeleton } from "./ui/skeleton";
 
 export function AccountMenu() {
+  const navigate = useNavigate()
 
   // query key serve para identificar uma requisição na aplicação, sendo assim sempre que tiver a mesma key, ela usa o cache
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ['profile'],
     queryFn: getProfile,
+    staleTime: Infinity
   })
 
   const { data: managedRestaurant, isLoading: isLoadingManagedRestaurant } = useQuery({
-    queryKey: ['managed-resturant'],
+    queryKey: ['managed-restaurant'],
     queryFn: getManagedRestaurant,
+    staleTime: Infinity
+  })
+
+  const { mutateAsync: signOutFn, isPending: IsSigningOut } = useMutation({
+    mutationFn: signOut,
+    onSuccess: () => {
+      // ele subtitui a rota ao inves de mandar pra uma rota, evitando que o usuário click em voltar e volte pro dashboard sem nada
+      navigate('/sign-in', { replace: true })
+    }
   })
 
   return (
@@ -60,9 +73,11 @@ export function AccountMenu() {
             </DropdownMenuItem>
           </DialogTrigger>
           {/* o dark: faz com que no modo dark ele tenha determinados estilos especificos */}
-          <DropdownMenuItem className="text-rose-500 dark:text-rose-400">
-            <LogOut className="mr-2 w-4 h-4" />
-            <span>Sair</span>
+          <DropdownMenuItem asChild className="text-rose-500 dark:text-rose-400" disabled={IsSigningOut}>
+            <button className="w-full" onClick={() => signOutFn}>
+              <LogOut className="mr-2 w-4 h-4" />
+              <span>Sair</span>
+            </button>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
